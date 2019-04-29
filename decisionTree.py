@@ -103,13 +103,13 @@ class Attr:
 class DecisionTree:
 	
 	def __init__(self, predictedIndex=-1, answer=None):
-		self.subtrees = []
-		self.questionAttr = None
-		self.predictedIndex = predictedIndex
-		self.answer = answer
-		self.data = None
-		self.listOfAttr = []
+		self.subtrees = []						# é vazia se for nodo de resposta (ou seja, nodo folha)
+		self.questionAttr = None				# é None se for nodo de resposta (ou seja, nodo folha)
+		self.predictedIndex = predictedIndex	# índice do atributo a ser previsto
+		self.answer = answer					# é None se for nodo de decisão (ou seja, nodo interno)
 		self.nodeGain = 0
+		self.data = None 						# é None, a não ser que seja nodo raiz
+		self.listOfAttr = []					# é vazia, a não ser que seja nodo raiz
 	
 	def makeRootNode(self, data):
 		self.data = data
@@ -161,10 +161,10 @@ class DecisionTree:
 					columnName = D.columns[self.predictedIndex]
 					column = D[columnName]
 					mostFrequentValue = column.value_counts().idxmax()
-					self.addSubtree( DecisionTree(answer=mostFrequentValue) ) # se Dv é vazio, o valor atual do atributo bestAttr leva a um nodo folha cuja
-																			  # resposta é simplesmente o valor mais frequente, em D, do atributo a ser predito
+					# se Dv é vazio, o valor atual do atributo bestAttr leva a um nodo folha cuja resposta é simplesmente o valor mais frequente, em D, do atributo a ser predito
+					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue) )
 				else:
-					self.addSubtree( DecisionTree().induce(Dv, L) ) # se não for vazio, cria uma subárvore e faz recursão
+					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L) ) # se não for vazio, cria uma subárvore e faz recursão
 		
 		return self
 	
