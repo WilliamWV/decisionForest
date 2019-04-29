@@ -103,7 +103,7 @@ class Attr:
 class DecisionTree:
 	
 	def __init__(self, predictedIndex=-1, answer=None):
-		self.subtrees = []						# é vazia se for nodo de resposta (ou seja, nodo folha)
+		self.subtrees = {}						# é vazio se for nodo de resposta (ou seja, nodo folha)
 		self.questionAttr = None				# é None se for nodo de resposta (ou seja, nodo folha)
 		self.predictedIndex = predictedIndex	# índice do atributo a ser previsto
 		self.answer = answer					# é None se for nodo de decisão (ou seja, nodo interno)
@@ -119,7 +119,7 @@ class DecisionTree:
 		attributes = []
 		for i in range(0, len(data.columns)):
 			columnName = data.columns[self.predictedIndex] # nome da coluna a ser predita
-			if columnName != data.columns[i]:			   # tal coluna não deve ser considerada pelo algoritmo de indução
+			if columnName != data.columns[i]:
 				values = data[data.columns[i]].unique()
 				if(isinstance(values[0], str)):
 					numericOrCategoric = CATEGORIC
@@ -128,8 +128,8 @@ class DecisionTree:
 				attributes.append(Attr(numericOrCategoric, i, values))
 		return attributes
 
-	def addSubtree (self, newTree):
-		self.subtrees.append(newTree)	
+	def addSubtree (self, newTree, decision):
+		self.subtrees[decision] = newTree
 
 	#instance deve ser uma instância dos dados de entrada que possui o mesmo 
 	#formato quanto a ordem e os tipos dos atributos
@@ -141,30 +141,29 @@ class DecisionTree:
 		column = D[columnName] # pega todos os dados da coluna
 		columnValues = column.unique() # separa cada valor único da coluna
 		
-		if len(columnValues) == 1: # se todas as instâncias em D possuem a mesma classe para o atributo a ser predito, então o nodo atual é folha e sua resposta é tal classe
+		if len(columnValues) == 1:
 			self.answer = columnValues[0]
 			return self
 		
 		mostFrequentValue = column.value_counts().idxmax() # pega o valor mais frequente da coluna
-		if len(L) == 0: # se L vazio, o nodo atual é folha com resposta igual à classe mais frequente em D
+		if len(L) == 0:
 			self.answer = mostFrequentValue
 			return self
 		
-		bestAttr = self.selectAndRemoveAttr(L, D) # seleciona o melhor atributo de L, o retira de L e o retorna
-		self.questionAttr = bestAttr # tal atributo passa a ser a pergunta do nodo
+		bestAttr = self.selectAndRemoveAttr(L, D)
+		self.questionAttr = bestAttr
 
 		if bestAttr.attrType == CATEGORIC:
-			columnName = D.columns[bestAttr.attrIndex] # pega nome da coluna que possui o melhor atributo para a divisão
-			for i in range(0, len(bestAttr.catVals)): # itera sobre os possíveis valores do atributo; cada um levará a uma subárvore de índice igual ao índice desse valor em bestAttr.catVals
-				Dv = D.loc[ D[columnName] == bestAttr.catVals[i] ] # separa todas as linhas cujo atributo bestAttr possua o valor atual (representado por bestAttr.catVals[i])
+			columnName = D.columns[bestAttr.attrIndex]
+			for i in range(0, len(bestAttr.catVals)):
+				Dv = D.loc[ D[columnName] == bestAttr.catVals[i] ] # obtém todas as linhas cujo atributo bestAttr possua o valor atual (representado por bestAttr.catVals[i])
 				if Dv.empty:
 					columnName = D.columns[self.predictedIndex]
 					column = D[columnName]
 					mostFrequentValue = column.value_counts().idxmax()
-					# se Dv é vazio, o valor atual do atributo bestAttr leva a um nodo folha cuja resposta é simplesmente o valor mais frequente, em D, do atributo a ser predito
-					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue) )
+					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), bestAttr.catVals[i] )
 				else:
-					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L) ) # se não for vazio, cria uma subárvore e faz recursão
+					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), bestAttr.catVals[i] )
 		
 		return self
 	
@@ -200,7 +199,7 @@ class DecisionTree:
 		attr = attributesGain[0][1]
 		self.nodeGain = attributesGain[0]
 		for i in range(0, len(L)):
-			if L[i].attrIndex == attributesGain[0][1].attrIndex:
+			if L[i].attrIndex == attr.attrIndex:
 				del L[i]
 				break
 		return attr
@@ -220,8 +219,12 @@ class DecisionTree:
 			print("Nodo de resposta com resposta: ", end="")
 			print(self.answer)
 		if (len(self.subtrees) > 0):
-			for i in range(0, len(self.subtrees)):
+			index = 0
+			for key in self.subtrees:
 				print("\t"*tabs, end='')
 				if self.questionAttr.attrType == CATEGORIC:
-					print("Subárvore " + str(i) + " (valor=" + str(self.questionAttr.catVals[i]) + "):" )
-				self.subtrees[i]._print(tabs+1)
+					print("Subárvore " + str(index) + " (valor=", end="")
+					print(key, end="")
+					print("):")
+				self.subtrees[key]._print(tabs+1)
+				index += 1
