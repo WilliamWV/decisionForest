@@ -1,3 +1,5 @@
+import pandas as pd
+
 # -*- coding: utf-8 -*-
 '''
 	Implementação do algoritmo de aprendizado supervisionado de florestas 
@@ -25,12 +27,18 @@ NUM_SMALLER = -2 # Valor numérico menor que o ponto de corte
 
 # Dados de entrada
 Data = [[]]
+dataPanda = pd.DataFrame
 
-# Quantidade de árvores na floresta
-ntree  = 10
+# Lista de atributos
+listOfAttr = []
 
-#Floresta de árvores de decisão
-forest = []
+def selectAndRemoveAttr(L):
+	#TODO
+	#PRECISA SER FEITO PELO CRITÉRIO DA DEFINIÇÃO DELES,
+	#ATUALMENTE SÓ SELECIONO O PRIMEIRO ATRIBUTO DA LISTA
+	attr = L[0]
+	del L[0]
+	return attr
 
 ################################################################################
 ### class Attr:                                                              ###
@@ -69,16 +77,21 @@ class Attr:
 	def _calcCutPoint(self):
 		#Usa média dos valores
 		return sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)
-	def _print(self):
+
+	def _print(self, tabs):
+		print("\t"*tabs, end='')
 		print("Atributo " + str(self.attrIndex))
 		if (self.attrType == CATEGORIC):
-			print ("    Tipo = CATEGORICO")
-			print ("    Valores = " + str(self.catVals))
+			print("\t"*(tabs+1), end='')
+			print ("Tipo = CATEGORICO")
+			print("\t"*(tabs+1), end='')
+			print ("Valores = " + str(self.catVals))
 		elif (self.attrType == NUMERIC):
-			print ("    Tipo = NUMERICO")
-			print ("    Ponto de corte = " + str(self.cutPoint))
+			print("\t"*(tabs+1), end='')
+			print ("Tipo = NUMERICO")
+			print("\t"*(tabs+1), end='')
+			print ("Ponto de corte = " + str(self.cutPoint))
 		print("")
-		
 
 ################################################################################
 ### class DecisionTree:                                                      ###
@@ -101,17 +114,17 @@ class Attr:
 
 class DecisionTree:
 	
-	def __init__(self, question):
+	def __init__(self, predictedIndex=-1, answer=None):
 		self.subtrees = []
-		self.questionAttr = question
+		self.questionAttr = None
+		self.predictedIndex = predictedIndex
+		self.answer = answer
+
 	
 	# Antes de inserir uma nova subárvore verifica se a decisão correspondente 
 	# já não foi associada a outra subárvore nesse mesmo nodo
-	def addSubtree (self, newTree, decisionResult):
-		if (decisionResult in [self.subtrees[i][1] for i in range(len(self.subtrees))]):
-			print("Failed to insert subtree once the corresponding result already exists on this node")
-		else:
-			self.subtrees.append((newTree, decisionResult))
+	def addSubtree (self, newTree):
+		self.subtrees.append(newTree)
 	
 
 	#instance deve ser uma instância dos dados de entrada que possui o mesmo 
@@ -119,34 +132,52 @@ class DecisionTree:
 	def classify(self, instance):
 		pass
 
-	def _print(self):
-		print ("Nodo de decisão")
-		print ("Decisão dada por: ")
-		self.questionAttr._print()
-		if (len(self.subtrees) > 0):		
-			print ("Subárvores:")
-			for i in self.subtrees:
-				print ("Decisão correspondente = " + str(i[1]))
-				i[0]._print()
+	def induce(self, D, L):
+		columnName = D.columns[self.predictedIndex] # nome da coluna a ser predita
+		column = D[columnName] # pega todos os dados da coluna
+		columnValues = column.unique() # separa cada valor único da coluna
 		
+		if len(columnValues) == 1:
+			self.answer = columnValues[0]
+			return self
+		
+		mostFrequentValue = column.value_counts().idxmax() # pega o valor mais frequente da coluna
+		if len(listOfAttr) == 0:
+			self.answer = mostFrequentValue
+			return self
+		
+		bestAttr = selectAndRemoveAttr(L) # seleciona o melhor atributo de L, o retira de L e o retorna
+		self.questionAttr = bestAttr # tal atributo passa a ser a pergunta do nodo
 
-################################################################################
-### TESTES - APAGAR QUANDO O ALGORITMO DE INDUÇÃO FOR IMPLEMENTADO          ####
-################################################################################
-Data = [[1.1, 0, 3], [3.7, 1, 6], [-1.6, 0, 9]]
+		if bestAttr.attrType == CATEGORIC:
+			columnName = D.columns[bestAttr.attrIndex] # pega nome da coluna que possui o melhor atributo para a divisão
+			for i in range(0, len(bestAttr.catVals)): # itera sobre os possíveis valores do atributo
+				Dv = D.loc[ D[columnName] == bestAttr.catVals[i] ] # separa todas as linhas cujo atributo bestAttr possua o valor atual (representado por bestAttr.catVals[i])
+				if Dv.empty:
+					columnName = D.columns[self.predictedIndex] # nome da coluna a ser predita
+					column = D[columnName]
+					mostFrequentValue = column.value_counts().idxmax()
+					self.addSubtree( DecisionTree(answer=mostFrequentValue) ) # se Dv é vazio, o valor atual do atributo bestAttr leva a um nodo folha cuja
+																			  # resposta é simplesmente o valor mais frequente, em D, do atributo a ser predito
+				else:
+					self.addSubtree( DecisionTree().induce(Dv, L) )
+		
+		return self
 
-attr1 = Attr(NUMERIC, 0, None)
-attr2 = Attr(CATEGORIC, 1, [0, 1])
-attr3 = Attr(NUMERIC, 2, None)
-
-attr1._print()
-attr2._print()
-attr3._print()
-
-root = DecisionTree(attr1)
-root.addSubtree(DecisionTree(attr2), -1)
-root.addSubtree(DecisionTree(attr3), -2)
-
-root._print()
-
-
+	def _print(self, tabs):
+		if self.questionAttr is not None:	
+			print("\t"*tabs, end='')
+			print ("Nodo de decisão")
+			print("\t"*tabs, end='')
+			print ("Decisão dada por: ")		
+			self.questionAttr._print(tabs)
+		if self.answer is not None:
+			print("\t"*tabs, end='')
+			print("Nodo de resposta com resposta: ", end="")
+			print(self.answer)
+		if (len(self.subtrees) > 0):
+			for i in range(0, len(self.subtrees)):
+				print("\t"*tabs, end='')
+				if self.questionAttr.attrType == CATEGORIC:
+					print("Subárvore " + str(i) + " (valor=" + str(self.questionAttr.catVals[i]) + "):" )
+				self.subtrees[i]._print(tabs+1)
