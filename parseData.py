@@ -3,7 +3,7 @@ import pandas as pd
 
 def listAttributes(data):
     attributes = []
-    for i in range(0, len(data.columns)):
+    for i in range(0, len(data.columns)-1):
         values = data[data.columns[i]].unique()
         if(isinstance(values[0], str)):
             #print("Categorico: " + values[0])

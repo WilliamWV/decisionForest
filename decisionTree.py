@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 # -*- coding: utf-8 -*-
 '''
@@ -32,12 +33,39 @@ dataPanda = pd.DataFrame
 # Lista de atributos
 listOfAttr = []
 
-def selectAndRemoveAttr(L):
-	#TODO
-	#PRECISA SER FEITO PELO CRITÉRIO DA DEFINIÇÃO DELES,
-	#ATUALMENTE SÓ SELECIONO O PRIMEIRO ATRIBUTO DA LISTA
-	attr = L[0]
-	del L[0]
+def info(D, index):
+	columnName = D.columns[index] # nome da coluna a ser predita
+	column = D[columnName]
+	listOfOccurrences = column.value_counts().tolist()
+	total = sum(listOfOccurrences)
+	info_D = 0
+	for i in listOfOccurrences:
+		info_D = info_D + (i/total)*math.log2(i/total)
+	info_D = (-1)*info_D
+	return info_D
+
+def selectAndRemoveAttr(L, D, index):
+	attributes = []
+	teste = []
+	info_D = info(D, index)
+	for i in L:
+		columnName = D.columns[i.attrIndex]
+		info_aD = 0
+		for j in i.catVals:
+			Dj = D.loc[ D[columnName] == j ]
+			counter = len(Dj.index)
+			info_aD = info_aD + (counter/len(D.index))*info(Dj, index)
+		gain = info_D - info_aD
+		attributes.append([gain, i])
+		teste.append([gain, i.attrIndex])
+	attributes.sort(key=lambda x: x[0], reverse=True)
+	teste.sort(key=lambda x: x[0], reverse=True)
+	print(teste)
+	attr = attributes[0][1]
+	for i in range(0, len(L)):
+		if L[i].attrIndex == attributes[0][1].attrIndex:
+			del L[i]
+			break
 	return attr
 
 ################################################################################
@@ -91,7 +119,6 @@ class Attr:
 			print ("Tipo = NUMERICO")
 			print("\t"*(tabs+1), end='')
 			print ("Ponto de corte = " + str(self.cutPoint))
-		print("")
 
 ################################################################################
 ### class DecisionTree:                                                      ###
@@ -146,7 +173,7 @@ class DecisionTree:
 			self.answer = mostFrequentValue
 			return self
 		
-		bestAttr = selectAndRemoveAttr(L) # seleciona o melhor atributo de L, o retira de L e o retorna
+		bestAttr = selectAndRemoveAttr(L, D, self.predictedIndex) # seleciona o melhor atributo de L, o retira de L e o retorna
 		self.questionAttr = bestAttr # tal atributo passa a ser a pergunta do nodo
 
 		if bestAttr.attrType == CATEGORIC:
