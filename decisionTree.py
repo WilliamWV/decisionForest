@@ -152,9 +152,9 @@ class DecisionTree:
 		
 		bestAttr = self.selectAndRemoveAttr(L, D)
 		self.questionAttr = bestAttr
+		columnName = D.columns[bestAttr.attrIndex]
 
 		if bestAttr.attrType == CATEGORIC:
-			columnName = D.columns[bestAttr.attrIndex]
 			for i in range(0, len(bestAttr.catVals)):
 				Dv = D.loc[ D[columnName] == bestAttr.catVals[i] ] # obtém todas as linhas cujo atributo bestAttr possua o valor atual (representado por bestAttr.catVals[i])
 				if Dv.empty:
@@ -164,6 +164,23 @@ class DecisionTree:
 					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), bestAttr.catVals[i] )
 				else:
 					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), bestAttr.catVals[i] )
+		else:
+			Dv = D.loc[ D[columnName] <= bestAttr.cutPoint ]
+			if Dv.empty:
+				columnName = D.columns[self.predictedIndex]
+				column = D[columnName]
+				mostFrequentValue = column.value_counts().idxmax()
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), "<="+str(bestAttr.cutPoint) )
+			else:
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), "<="+str(bestAttr.cutPoint) )
+			Dv = D.loc[ D[columnName] > bestAttr.cutPoint ]
+			if Dv.empty:
+				columnName = D.columns[self.predictedIndex]
+				column = D[columnName]
+				mostFrequentValue = column.value_counts().idxmax()
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), ">"+str(bestAttr.cutPoint) )
+			else:
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), ">"+str(bestAttr.cutPoint) )
 		
 		return self
 	
@@ -185,9 +202,17 @@ class DecisionTree:
 		for i in L:
 			columnName = D.columns[i.attrIndex] # nome do atributo cujo ganho está sendo calculado
 			infoAD = 0
-			for j in i.catVals:
-				Dj = D.loc[ D[columnName] == j ] # obtém as linhas cujo valor do atributo em questão seja igual a J
-				counter = len(Dj.index) # número de linhas em Dj
+			if i.attrType == CATEGORIC:
+				for j in i.catVals:
+					Dj = D.loc[ D[columnName] == j ] # obtém as linhas cujo valor do atributo em questão seja igual a J
+					counter = len(Dj.index) # número de linhas em Dj
+					infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
+			else:
+				Dj = D.loc[ D[columnName] <= i.cutPoint ]
+				counter = len(Dj.index)
+				infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
+				Dj = D.loc[ D[columnName] > i.cutPoint ]
+				counter = len(Dj.index)
 				infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
 			gain = infoD - infoAD
 			attributesGain.append([gain, i])
@@ -222,9 +247,8 @@ class DecisionTree:
 			index = 0
 			for key in self.subtrees:
 				print("\t"*tabs, end='')
-				if self.questionAttr.attrType == CATEGORIC:
-					print("Subárvore " + str(index) + " (valor=", end="")
-					print(key, end="")
-					print("):")
+				print("Subárvore " + str(index) + " (valor: ", end="")
+				print(key, end="")
+				print("):")
 				self.subtrees[key]._print(tabs+1)
 				index += 1
