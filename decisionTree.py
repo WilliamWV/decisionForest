@@ -67,6 +67,21 @@ class Attr:
 		#Usa média dos valores
 		return sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)
 
+	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
+	# a esse atributo
+	def decide (self, instance):
+		if self.attrType == NUMERIC:
+			if (instance[self.attrIndex] > self.cutPoint):
+				return NUM_GREATER
+			else:
+				return NUM_SMALLER
+		elif self.attrType == CATEGORIC:
+			if instance[self.attrIndex] in self.catVals: 
+				return instance[self.attrIndex]
+			else:
+				print ("ERROR: non-existing categoric value")
+	
+
 	def _print(self, tabs):
 		print("\t"*tabs, end='')
 		print("Atributo " + str(self.attrIndex))
@@ -134,7 +149,11 @@ class DecisionTree:
 	#instance deve ser uma instância dos dados de entrada que possui o mesmo 
 	#formato quanto a ordem e os tipos dos atributos
 	def classify(self, instance):
-		pass
+		if (self.questionAttr == None):
+			return self.answer
+		else:
+			return self.subtrees[self.questionAttr.decide(instance)].classify(instance)
+
 
 	def induce(self, D, L):
 		columnName = D.columns[self.predictedIndex] # nome da coluna a ser predita
@@ -170,17 +189,17 @@ class DecisionTree:
 				columnName = D.columns[self.predictedIndex]
 				column = D[columnName]
 				mostFrequentValue = column.value_counts().idxmax()
-				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), "<="+str(bestAttr.cutPoint) )
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), NUM_SMALLER )
 			else:
-				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), "<="+str(bestAttr.cutPoint) )
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), NUM_SMALLER )
 			Dv = D.loc[ D[columnName] > bestAttr.cutPoint ]
 			if Dv.empty:
 				columnName = D.columns[self.predictedIndex]
 				column = D[columnName]
 				mostFrequentValue = column.value_counts().idxmax()
-				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), ">"+str(bestAttr.cutPoint) )
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), NUM_GREATER )
 			else:
-				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), ">"+str(bestAttr.cutPoint) )
+				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), NUM_GREATER )
 		
 		return self
 	
@@ -248,7 +267,13 @@ class DecisionTree:
 			for key in self.subtrees:
 				print("\t"*tabs, end='')
 				print("Subárvore " + str(index) + " (valor: ", end="")
-				print(key, end="")
+				if (self.questionAttr != None and self.questionAttr.attrType == NUMERIC):
+					if (key == NUM_GREATER):
+						print ("> " + str(self.questionAttr.cutPoint), end="")
+					else:
+						print ("<= " + str(self.questionAttr.cutPoint), end="")
+				else:
+					print(key, end="")
 				print("):")
 				self.subtrees[key]._print(tabs+1)
 				index += 1
