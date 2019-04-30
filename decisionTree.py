@@ -101,18 +101,19 @@ class Attr:
 ###  * Usada para representar uma árvore de decisão, cada nodo da árvore     ### 
 ###    possui a representação da decisão que é feita nesse nodo bem como sua ###
 ###    lista de subárvores                                                   ###
-###  * Cada subárvore é representada por uma tupla onde o primeiro elemento  ###
-###    é a ssubárvore em si do tipo DecisionTree e o segundo é um valor      ###
-###    numérico que indica qual o resultado da decisão que deve ocorrer      ###
-###    nesse nodo para que a classificação continue na subárvore da tupla,   ###
+###  * As subárvores são representadas por um dicionário que associa         ###
+###    decisões a subárvores, de modo que, a partir de uma decisão que       ###
+###    corresponde a uma instância, se possa obter a próxima árvore para     ###
+###    seguir a classificação                                                ###
 ###    ex:                                                                   ###
-###         Nodo deve decidir se atributo 1 é maior do que 7, se for maior   ###
+###         Nodo deve decide se atributo 1 é maior do que 7, se for maior    ###
 ###         (NUM_GREATER = -1) a classificação continua pela subárvore A     ###
 ###         se não (NUM_SMALLER = -2), a classificação continua pela         ###
 ###         subárvore B, nesse caso o membro "self.subtrees" seria:          ###
-###         [(A, -1), (B, -2)]                                               ###
+###         { -1 : A, -2 : B }                                               ###
 ###  * Responsável por:                                                      ###
 ###    - Classificar uma entrada conforme as decisões dos nodos              ###
+###    - Induzir uma árvore de decisão                                       ###
 ################################################################################
 
 class DecisionTree:
