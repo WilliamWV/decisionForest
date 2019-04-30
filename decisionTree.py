@@ -103,7 +103,7 @@ class Attr:
 class DecisionTree:
 	
 	def __init__(self, predictedIndex=-1, answer=None):
-		self.subtrees = {}						# é vazio se for nodo de resposta (ou seja, nodo folha)
+		self.subtrees = {}						# é vazio se for nodo de resposta (ou seja, nodo folha); a chave é a resposta para uma pergunta, o valor é a subárvore alcançada por tal resposta
 		self.questionAttr = None				# é None se for nodo de resposta (ou seja, nodo folha)
 		self.predictedIndex = predictedIndex	# índice do atributo a ser previsto
 		self.answer = answer					# é None se for nodo de decisão (ou seja, nodo interno)
@@ -170,26 +170,26 @@ class DecisionTree:
 	def info(self, D):
 		columnName = D.columns[self.predictedIndex]
 		column = D[columnName]
-		listOfOccurrences = column.value_counts().tolist()
-		total = sum(listOfOccurrences)
-		info_D = 0
+		listOfOccurrences = column.value_counts().tolist() # lista com o número de ocorrências de cada valor do atributo a ser predito
+		rows = sum(listOfOccurrences)
+		infoD = 0
 		for i in listOfOccurrences:
-			info_D = info_D + (i/total)*math.log2(i/total)
-		info_D = (-1)*info_D
-		return info_D
+			infoD = infoD + (i/rows)*math.log2(i/rows)
+		infoD = (-1)*infoD
+		return infoD
 	
 	def gain(self, L, D):
-		info_D = self.info(D)
+		infoD = self.info(D)
 		index = self.predictedIndex
 		attributesGain = []
 		for i in L:
-			columnName = D.columns[i.attrIndex]
-			info_aD = 0
+			columnName = D.columns[i.attrIndex] # nome do atributo cujo ganho está sendo calculado
+			infoAD = 0
 			for j in i.catVals:
-				Dj = D.loc[ D[columnName] == j ]
-				counter = len(Dj.index)
-				info_aD = info_aD + (counter/len(D.index))*self.info(Dj)
-			gain = info_D - info_aD
+				Dj = D.loc[ D[columnName] == j ] # obtém as linhas cujo valor do atributo em questão seja igual a J
+				counter = len(Dj.index) # número de linhas em Dj
+				infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
+			gain = infoD - infoAD
 			attributesGain.append([gain, i])
 		return attributesGain
 
@@ -199,7 +199,7 @@ class DecisionTree:
 		attr = attributesGain[0][1]
 		self.nodeGain = attributesGain[0]
 		for i in range(0, len(L)):
-			if L[i].attrIndex == attr.attrIndex:
+			if L[i] == attr:
 				del L[i]
 				break
 		return attr
