@@ -1,4 +1,5 @@
 import decisionTree as dt
+import test
 import pandas as pd
 import random as rd
 
@@ -44,45 +45,18 @@ def bootstrap(data):
         test = test.append(data[i:i+1])
     
     return (train, test)
-
-def testClassify(tree):
-    #Instâncias já existentes
-    inst1 = ["Ensolarado", "Quente", "Alta", "Falso"] # Esperar Nao
-    inst2 = ["Ensolarado", "Fria", "Normal", "Falso"] # Esperar Sim
-    inst3 = ["Chuvoso", "Fria", "Normal", "Verdadeiro"] # Esperar Nao
-    #Instâncias novas
-    inst4 = ["Ensolarado", "Fria", "Alta", "Verdadeiro"] 
-    inst5 = ["Nublado", "Amena", "Normal", "Falso"]
-    inst6 = ["Chuvoso", "Quente", "Alta", "Falso"]
     
-    insts = [inst1, inst2, inst3, inst4, inst5, inst6]
-
-    for inst in insts:
-        print ("Classificação da instância " + str(inst) + ":")
-        ans = tree.classify(inst)
-        print ("Resultado da classificação: " + str(ans))
-
-def testBootstrap(dataPanda):
-    print("\nBOOTSTRAP 1:")
-    (treino, teste) = bootstrap(dataPanda)
-    print("treino: "+ str(len(treino)) + "\n" + str(treino))
-    print("teste: "+ str(len(teste)) + "\n" + str(teste))
-    print("\nBOOTSTRAP 2:")
-    (treino, teste) = bootstrap(dataPanda)
-    print("treino: "+ str(len(treino)) + "\n" + str(treino))
-    print("teste: "+ str(len(teste)) + "\n" + str(teste))
-    
+### OBS IMPORTANTE: quando a indução do enemble e a validação cruzada estiverem prontas
+### a função bootstrap() deve ser usada para obter os conjuntos de teste e de treinamento,
+### os dados passados para a função makeRootNode devem ser o conjunto de treinamento retornado
+### dessa função, além disso o comando dt.Data = data.values.tolist() da função parse deve ser 
+### movido para a função que à lista dt.Data seja assinalado o valor correspondente do conjunto
+### de treino "treino.values.tolist()"
 
 def main():
     fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
     dataPanda = parse(fileName)
-    root = dt.DecisionTree()
-    root.makeRootNode(dataPanda)
-    root.induce(root.data, root.listOfAttr)
-    root._print(0)
-    testClassify(root)
-    testBootstrap(dataPanda)
-    
+    test.test(dataPanda)
 
 
 if __name__ == "__main__":
