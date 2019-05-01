@@ -46,12 +46,13 @@ def bootstrap(data):
     
     return (train, test)
     
-### OBS IMPORTANTE: quando a indução do enemble e a validação cruzada estiverem prontas
-### a função bootstrap() deve ser usada para obter os conjuntos de teste e de treinamento,
-### os dados passados para a função makeRootNode devem ser o conjunto de treinamento retornado
-### dessa função, além disso o comando dt.Data = data.values.tolist() da função parse deve ser 
-### movido para a função que à lista dt.Data seja assinalado o valor correspondente do conjunto
-### de treino "treino.values.tolist()"
+
+### Coisas para fazer quando estivermos com tudo pronto separadamente
+### TODO: trocar o valor m da amostragem que atualmente é len(L) -> não possui efeitos
+### TODO: chamar a funao bootstrap() para obter os dados de teste e de treinamento usados de fato
+###       para treinar as árvores
+### TODO: assinalar ao valor dt.Data o resultado da função bootstrap para o conjunto de treino
+###       convertido para listas, ou seja: treino.values.tolist()
 
 def main():
     fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"

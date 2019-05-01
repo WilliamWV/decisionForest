@@ -1,5 +1,6 @@
 import pandas as pd
 import math
+import random as rd
 
 # -*- coding: utf-8 -*-
 '''
@@ -215,11 +216,20 @@ class DecisionTree:
 		infoD = (-1)*infoD
 		return infoD
 	
+	# A amostragem dos atributos deve ocorrer a cada nodo da árvore, portanto, na mesma árvore, cada
+	# nodo deve considerar um subconjunto dos atributos que potencialmente será diferente dos demais
+	# subconjuntos dos outros nodos da mesma subárvore. Portanto a amostragem deve ser feita de forma
+	# independente dentro de cada nodo, a opção escolhida nesse caso é implementar a amostragem dos
+	# atributos dentro da função "gain" abaixo, pois ela calcula quanto será o nodo de cada 
+	
 	def gain(self, L, D):
 		infoD = self.info(D)
 		index = self.predictedIndex
 		attributesGain = []
-		for i in L:
+		m = len(L) # Quantidade de atributos na amostragem, DEVE SER MODIFICADA PARA REALIZAR A AMOSTRAGEM
+		#m = int(math.ceil(math.sqrt(len(L)))) # usando m como raiz quadrada -> alternativa sugerida nos slides
+		attributesSample = rd.sample(L, m)
+		for i in attributesSample:
 			columnName = D.columns[i.attrIndex] # nome do atributo cujo ganho está sendo calculado
 			infoAD = 0
 			if i.attrType == CATEGORIC:
