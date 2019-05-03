@@ -1,6 +1,7 @@
 from main import parse
 from main import bootstrap
-import decisionTree as dt
+import decisiontree as dt
+import plottree as pt
 
 def testClassify(tree):
     #Instâncias já existentes
@@ -19,24 +20,29 @@ def testClassify(tree):
         ans = tree.classify(inst)
         print ("Resultado da classificação: " + str(ans))
 
-def testBootstrap(dataPanda):
+def testBootstrap(data):
     print("\nBOOTSTRAP 1:")
-    (treino, teste) = bootstrap(dataPanda)
+    (treino, teste) = bootstrap(data)
     print("treino: "+ str(len(treino)) + "\n" + str(treino))
     print("teste: "+ str(len(teste)) + "\n" + str(teste))
     print("\nBOOTSTRAP 2:")
-    (treino, teste) = bootstrap(dataPanda)
+    (treino, teste) = bootstrap(data)
     print("treino: "+ str(len(treino)) + "\n" + str(treino))
     print("teste: "+ str(len(teste)) + "\n" + str(teste))
 
-def testInduce(dataPanda):
+def testInduce(data):
     root = dt.DecisionTree()
-    root.makeRootNode(dataPanda)
+    root.makeRootNode(data)
     root.induce(root.data, root.listOfAttr)
     root._print(0)
     return root
 
-def test(dataPanda):
-    tree = testInduce(dataPanda)
-    testClassify(tree)
-    testBootstrap(dataPanda)
+def testPlotting(tree):
+	plot = pt.PlotTree(tree)
+	plot.drawTree()
+
+def test(data):
+	tree = testInduce(data)
+	#testPlotting(tree)
+	testClassify(tree)
+	testBootstrap(data)

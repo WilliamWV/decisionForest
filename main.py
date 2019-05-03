@@ -1,4 +1,4 @@
-import decisionTree as dt
+import decisiontree as dt
 import test
 import pandas as pd
 import random as rd
@@ -16,9 +16,8 @@ forest = []
 
 def parse(fileName):
     data = pd.read_csv(fileName, delimiter=';', header=0)
-    dataPanda = data
     dt.Data = data.values.tolist()
-    return dataPanda
+    return data
 
 # Realização do bootstrap dos dados dividindo-os em conjunto de teste
 # e de treinamento, a divisão é feita usando o seguinte valor que indica
@@ -56,8 +55,8 @@ def bootstrap(data):
 
 def main():
     fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
-    dataPanda = parse(fileName)
-    test.test(dataPanda)
+    data = parse(fileName)
+    test.test(data)
 
 
 if __name__ == "__main__":

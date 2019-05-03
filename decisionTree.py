@@ -41,9 +41,10 @@ Data = [[]]
 ################################################################################
 class Attr:
 
-	def __init__(self, attrType, attrIndex, values):
+	def __init__(self, attrType, attrIndex, values, attrName):
 		self.attrType = attrType
 		self.attrIndex = attrIndex
+		self.attrName = attrName
 		
 		if (attrType == CATEGORIC):
 			self.catVals = values
@@ -142,7 +143,7 @@ class DecisionTree:
 					numericOrCategoric = CATEGORIC
 				else:
 					numericOrCategoric = NUMERIC
-				attributes.append(Attr(numericOrCategoric, i, values))
+				attributes.append(Attr(numericOrCategoric, i, values, data.columns[i]))
 		return attributes
 
 	def addSubtree (self, newTree, decision):
@@ -259,17 +260,26 @@ class DecisionTree:
 				break
 		return attr
 
+	def isAnswerNode(self):
+		if self.answer is not None:
+			return True
+		else:
+			return False
+	
+	def isQuestionNode(self):
+		return not(self.isAnswerNode())
+
 	def _print(self, tabs):
 		print("\t"*tabs, end='')
 		print("Ganho do nodo: ", end="")
 		print(self.nodeGain)
-		if self.questionAttr is not None:	
+		if self.isQuestionNode():	
 			print("\t"*tabs, end='')
 			print ("Nodo de decisão")
 			print("\t"*tabs, end='')
 			print ("Decisão dada por: ")		
 			self.questionAttr._print(tabs)
-		if self.answer is not None:
+		if self.isAnswerNode():
 			print("\t"*tabs, end='')
 			print("Nodo de resposta com resposta: ", end="")
 			print(self.answer)
@@ -278,7 +288,7 @@ class DecisionTree:
 			for key in self.subtrees:
 				print("\t"*tabs, end='')
 				print("Subárvore " + str(index) + " (valor: ", end="")
-				if (self.questionAttr != None and self.questionAttr.attrType == NUMERIC):
+				if (self.isQuestionNode() and self.questionAttr.attrType == NUMERIC):
 					if (key == NUM_GREATER):
 						print ("> " + str(self.questionAttr.cutPoint), end="")
 					else:
