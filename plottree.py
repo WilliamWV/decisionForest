@@ -1,6 +1,7 @@
 import graphviz as grv
 import copy
 from time import localtime, strftime
+import decisiontree as dt
 import os
 
 os.environ["PATH"] += os.pathsep + 'D:/ProgramFiles/VSUtilities/Library/bin/graphviz'
@@ -40,7 +41,13 @@ class PlotTree:
             self.graph.edge(parentName, nodeName, label=" "+key)
             color = self.chooseColor()
             for key in tree.subtrees:
-                self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
+                if tree.questionAttr.isCategoric():
+                    self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
+                else:
+                    if key == dt.NUM_GREATER:
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                    else:
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
 
     def decisionTreeToGraphviz(self, tree, color):
         nodeName = tree.questionAttr.attrName
@@ -53,7 +60,13 @@ class PlotTree:
             self.graph.node(nodeName, nodeInfo, color=color)
             color = self.chooseColor()
             for key in tree.subtrees:
-                self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
+                if tree.questionAttr.isCategoric():
+                    self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
+                else:
+                    if key == dt.NUM_GREATER:
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                    else:
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
 
     def drawTree(self):
         time = strftime("%d_%m_%Y_%H_%M_%S", localtime())

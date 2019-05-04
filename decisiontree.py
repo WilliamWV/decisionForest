@@ -49,7 +49,16 @@ class Attr:
 		if (attrType == CATEGORIC):
 			self.catVals = values
 		elif (attrType == NUMERIC):
-			self.cutPoint = self._calcCutPoint()					
+			self.cutPoint = self._calcCutPoint()	
+
+	def isNumeric(self):
+		if self.attrType == NUMERIC:
+			return True
+		else:
+			return False
+	
+	def isCategoric(self):
+		return not(self.isNumeric())
 
 	def getCutPoint(self): 
 		if self.attrType != NUMERIC:
