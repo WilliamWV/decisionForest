@@ -3,6 +3,7 @@ import math
 import random as rd
 
 # -*- coding: utf-8 -*-
+
 '''
 	Implementação do algoritmo de aprendizado supervisionado de florestas 
 	aleatórias para classificação de dados construindo um ensemble de árvore 

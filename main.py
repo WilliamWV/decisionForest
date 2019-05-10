@@ -2,6 +2,7 @@ import decisiontree as dt
 import test
 import pandas as pd
 import random as rd
+import operator 
 
 # Semente para geração dos números aleatórios, usada em fase de 
 # desenvolvimento para permitir que os resultados possam ser repetidos
@@ -12,6 +13,15 @@ ntree  = 10
 
 # Floresta de árvores de decisão
 forest = []
+
+
+def getCategories(data, predictionIndex):
+    columnName = data.columns[predictionIndex] # nome da coluna a ser predita
+    column = data[columnName]                  # pega todos os dados da coluna
+    columnValues = column.unique()             # separa cada valor único da coluna
+    numberOfInstances = dict(column.value_counts())
+
+    return columnValues, numberOfInstances
 
 
 def parse(fileName):
@@ -44,6 +54,44 @@ def bootstrap(data):
         test = test.append(data[i:i+1])
     
     return (train, test)
+
+
+
+def trainEnsemble(data, numTrees):
+    ensemble = []
+    for tree_index in range(numTrees):
+        train, test = bootstrap(data)
+        print("treino: "+ str(len(train)) + "\n" + str(train))
+
+        root = dt.DecisionTree()
+        root.makeRootNode(train)
+        root.induce(root.data, root.listOfAttr)
+
+        ensemble += [root]
+
+    return ensemble
+
+
+def vote(ensemble, instance, categories):
+    answers = {}
+    for category in categories:
+        answers[category] = 0
+
+    for tree_index, tree in enumerate(ensemble):
+        ans = tree.classify(instance)
+        answers[ans] += 1
+
+    answers = sorted(answers.items(), key=operator.itemgetter(1), reverse=True)
+
+    for category, votes in answers:
+        return category
+
+
+def cross_validation(data, predictionIndex):
+    categories, numberOfInstances = getCategories(data, predictionIndex)
+
+
+
     
 
 ### Coisas para fazer quando estivermos com tudo pronto separadamente
@@ -56,7 +104,8 @@ def bootstrap(data):
 def main():
     fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
     data = parse(fileName)
-    test.test(data)
+    # test.test(data
+    cross_validation(data, -1)
 
 
 if __name__ == "__main__":

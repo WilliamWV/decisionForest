@@ -1,5 +1,9 @@
 from main import parse
 from main import bootstrap
+from main import trainEnsemble
+from main import vote
+from main import getCategories
+
 import decisiontree as dt
 import plottree as pt
 
@@ -41,8 +45,40 @@ def testPlotting(tree):
 	plot = pt.PlotTree(tree)
 	plot.drawTree()
 
+def testEnsemble(data):
+    print(" -------- Ensemble de 1 arvore --------")
+    ensemble = trainEnsemble(data, 1)
+    for i, e in enumerate(ensemble):
+        print(" ## Arvore %d --------" % i)
+        e._print(0)
+
+    print(" -------- Ensemble de 3 arvores --------")
+    ensemble = trainEnsemble(data, 3)
+    for i, e in enumerate(ensemble):
+        print(" ## Arvore %d --------" % i)
+        e._print(0)
+
+def testVote(data):
+    inst1 = ["Nublado", "Quente", "Normal", "Falso"]  # Espera Sim
+    inst2 = ["Nublado", "Quente", "Alta", "Falso"]    # Espera Sim
+
+    categories, _ = getCategories(data, -1)
+
+    print(" -------- Ensemble de 3 arvores --------")
+    ensemble = trainEnsemble(data, 3)
+    print("Classificacao da instancia 1: %s (era pra ser Sim)" % vote(ensemble, inst1, categories))
+    print("Classificacao da instancia 2: %s (era pra ser Sim)" % vote(ensemble, inst2, categories))
+
 def test(data):
-	tree = testInduce(data)
-	#testPlotting(tree)
-	testClassify(tree)
-	testBootstrap(data)
+	# print("######################## TESTE INDUCE ###########################")
+	# tree = testInduce(data)
+	# print("######################## TESTE PLOTTING ###########################")
+	# # testPlotting(tree)
+	# print("######################## TESTE CLASSIFY ###########################")
+	# testClassify(tree)
+	# print("######################## TESTE BOOTSTRAP ###########################")
+	# testBootstrap(data)
+	# print("######################## TESTE ENSEMBLE ###########################")
+	# testEnsemble(data)
+    print("######################## TESTE VOTE ###########################")
+    # testVote(data)
