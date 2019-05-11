@@ -8,10 +8,8 @@ import argparse
 
 # Semente para geração dos números aleatórios, usada em fase de 
 # desenvolvimento para permitir que os resultados possam ser repetidos
-rd_seed = 135872916542
+rd_seed = 6041
 
-# Quantidade de árvores na floresta
-ntree  = 10
 
 # Floresta de árvores de decisão
 forest = []
@@ -36,10 +34,8 @@ def parse(fileName, ignore):
     return data
 
 # Realização do bootstrap dos dados dividindo-os em conjunto de teste
-# e de treinamento, a divisão é feita usando o seguinte valor que indica
-# qual o tamanho do bootstrap comparado com o conjunto de treinamento
-bootstrap_size = 0.9 # 90% do tamanho do conjunto original
-# como o bootstrap realizado é com reposição, mesmo que o valor acima 
+# e de treinamento.
+# Como o bootstrap realizado é com reposição, mesmo que o valor acima 
 # seja igual a 1 (mesmo tamanho do conjunto original), o bootstrap de
 # treinamento retornado, muito provavelmente será diferente do conjunto
 # de dados originais, pois instâncias podem ser escolhidas múltiplas vezes
@@ -49,7 +45,7 @@ def bootstrap(data):
     train = pd.DataFrame()
     test = pd.DataFrame()
     choosed = []
-    for _ in range(int(bootstrap_size * len(data))):
+    for _ in range(len(data)):
         index = rd.choice(range(len(data)))
         choosed.append(index)
         # Usando list slice aqui para que o pandas monte um DataFrame com a 
@@ -161,83 +157,57 @@ def cross_validation(data, predictionIndex, k, numTrees, beta, score_mode):
 
 
 def Fmeasure(results, categories, beta, score_mode):
-    # classificação binária
-    if len(categories) == 2:
+    VPac = VNac = FPac = FNac = 0 # valores acumulados para todas as classes, a ser utilizado no caso de score_mode = micro média 
+    all_precision = []
+    all_recall = [] # resultados de precisão e recall para cada classe, a ser utilizado no caso de score_mode = macro média
+    # Tratamento multiclasse realizado independentemente da quantidade de classes
+    for category in categories:
         VP = VN = FP = FN = 0
         for r in results:
-            if r[0] == categories[0] and r[1] == categories[0]:
+            if r[0] == category and r[1] == category:
                 VP += 1
-            elif r[0] == categories[0] and r[1] != categories[0]:
+            elif r[0] == category and r[1] != category:
                 FN +=1
-            elif r[0] != categories[0] and r[1] == categories[0]:
+            elif r[0] != category and r[1] == category:
                 FP +=1
             else:
                 VN += 1
-
+        
         # print("VP = %d" % VP)
         # print("VN = %d" % VN)
         # print("FP = %d" % FP)
         # print("FN = %d" % FN)
-
-        precision = VP / (VP + FP)
-        recall = VP / (VP + FN)
-
-        fscore = (1 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
-
-    # classificação multiclasse
-    else:
-        VPac = VNac = FPac = FNac = 0 # valores acumulados para todas as classes, a ser utilizado no caso de score_mode = micro média 
-        all_precision = []
-        all_recall = [] # resultados de precisão e recall para cada classe, a ser utilizado no caso de score_mode = macro média
-        for category in categories:
-            VP = VN = FP = FN = 0
-            for r in results:
-                if r[0] == category and r[1] == category:
-                    VP += 1
-                elif r[0] == category and r[1] != category:
-                    FN +=1
-                elif r[0] != category and r[1] == category:
-                    FP +=1
-                else:
-                    VN += 1
-            
-            # print("VP = %d" % VP)
-            # print("VN = %d" % VN)
-            # print("FP = %d" % FP)
-            # print("FN = %d" % FN)
-            
-            if score_mode == 'macro':
-                precision = VP / (VP + FP)
-                recall = VP / (VP + FN)
-               
-                all_precision += [precision]
-                all_recall += [recall]
+        
+        if score_mode == 'macro':
+            # Evitar divisão por zero
+            if VP + FP == 0:
+                precision = 0
             else:
-                VPac += VP
-                VNac += VN
-                FPac += FP
-                FNac += FN
+                precision = VP / (VP + FP)
+            if VP + FN == 0:
+                recall = 0
+            else:
+                recall = VP / (VP + FN)
+            
+            all_precision += [precision]
+            all_recall += [recall]
+        else:
+            VPac += VP
+            VNac += VN
+            FPac += FP
+            FNac += FN
 
-        if score_mode == 'micro':
-            precision = VPac / (VPac + FPac)
-            recall = VPac / (VPac + FNac)
-        else: # macro
-            precision = np.mean(all_precision)
-            recall = np.mean(all_recall)
+    if score_mode == 'micro':
+        precision = VPac / (VPac + FPac)
+        recall = VPac / (VPac + FNac)
+    else: # macro
+        precision = np.mean(all_precision)
+        recall = np.mean(all_recall)
 
-        fscore = (1.0 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
+    fscore = (1.0 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
 
     return fscore
 
-
-    
-
-### Coisas para fazer quando estivermos com tudo pronto separadamente
-### TODO: trocar o valor m da amostragem que atualmente é len(L) -> não possui efeitos
-### TODO: chamar a funao bootstrap() para obter os dados de teste e de treinamento usados de fato
-###       para treinar as árvores
-### TODO: assinalar ao valor dt.Data o resultado da função bootstrap para o conjunto de treino
-###       convertido para listas, ou seja: treino.values.tolist()
 
 def main():
     parser = argparse.ArgumentParser(description="Random forests")
@@ -276,4 +246,6 @@ def main():
 
 if __name__ == "__main__":
     rd.seed(rd_seed)
+    np.random.seed(rd_seed)
     main()
+

@@ -237,8 +237,8 @@ class DecisionTree:
 		infoD = self.info(D)
 		index = self.predictedIndex
 		attributesGain = []
-		m = len(L) # Quantidade de atributos na amostragem, DEVE SER MODIFICADA PARA REALIZAR A AMOSTRAGEM
-		#m = int(math.ceil(math.sqrt(len(L)))) # usando m como raiz quadrada -> alternativa sugerida nos slides
+		#m = len(L) # Quantidade de atributos na amostragem
+		m = int(math.ceil(math.sqrt(len(L)))) # usando m como raiz quadrada -> alternativa sugerida nos slides
 		attributesSample = rd.sample(L, m)
 		for i in attributesSample:
 			columnName = D.columns[i.attrIndex] # nome do atributo cujo ganho está sendo calculado
