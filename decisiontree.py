@@ -67,29 +67,29 @@ class Attr:
 		else:
 			return self.cutPoint
 
-
 	def getCatVals(self): 
 		if self.attrType != CATEGORIC:
 			return None
 		else:
 			return self.catVals
 
-
 	def _calcCutPoint(self):
 		#Usa média dos valores
+		total = 0
+
 		return sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)
 
 	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
 	# a esse atributo
-	def decide (self, instance):
+	def decide (self, instance, predictedIndex):
 		if self.attrType == NUMERIC:
-			if (instance[self.attrIndex] > self.cutPoint):
+			if (instance[self.attrIndex-(1+predictedIndex)] > self.cutPoint):
 				return NUM_GREATER
 			else:
 				return NUM_SMALLER
 		elif self.attrType == CATEGORIC:
-			if instance[self.attrIndex] in self.catVals: 
-				return instance[self.attrIndex]
+			if instance[self.attrIndex-(1+predictedIndex)] in self.catVals: 
+				return instance[self.attrIndex-(1+predictedIndex)]
 			else:
 				print ("ERROR: non-existing categoric value")
 	
@@ -153,7 +153,7 @@ class DecisionTree:
 					numericOrCategoric = CATEGORIC
 				else:
 					numericOrCategoric = NUMERIC
-				attributes.append(Attr(numericOrCategoric, i-(1-self.predictedIndex), values, data.columns[i]))
+				attributes.append(Attr(numericOrCategoric, i, values, data.columns[i]))
 		return attributes
 
 	def addSubtree (self, newTree, decision):
@@ -165,7 +165,7 @@ class DecisionTree:
 		if (self.questionAttr == None):
 			return self.answer
 		else:
-			return self.subtrees[self.questionAttr.decide(instance)].classify(instance)
+			return self.subtrees[self.questionAttr.decide(instance, self.predictedIndex)].classify(instance)
 
 
 	def induce(self, D, L):
@@ -199,16 +199,16 @@ class DecisionTree:
 		else:
 			Dv = D.loc[ D[columnName] <= bestAttr.cutPoint ]
 			if Dv.empty:
-				columnName = D.columns[self.predictedIndex]
-				column = D[columnName]
+				columnNamePred = D.columns[self.predictedIndex]
+				column = D[columnNamePred]
 				mostFrequentValue = column.value_counts().idxmax()
 				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), NUM_SMALLER )
 			else:
 				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), NUM_SMALLER )
 			Dv = D.loc[ D[columnName] > bestAttr.cutPoint ]
 			if Dv.empty:
-				columnName = D.columns[self.predictedIndex]
-				column = D[columnName]
+				columnNamePred = D.columns[self.predictedIndex]
+				column = D[columnNamePred]
 				mostFrequentValue = column.value_counts().idxmax()
 				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), NUM_GREATER )
 			else:

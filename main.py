@@ -28,11 +28,11 @@ def getCategories(data, predictionIndex):
 
 def parse(fileName, ignore):
     data = pd.read_csv(fileName, delimiter=',', header=0)
-    dt.Data = data.values.tolist()
-
+    
     if ignore:
         data = data.drop(columns=[ignore])
     
+    dt.Data = data.values.tolist()
     return data
 
 # Realização do bootstrap dos dados dividindo-os em conjunto de teste
@@ -93,7 +93,7 @@ def vote(ensemble, instance, categories):
         return category
 
 
-def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='macro'):
+def cross_validation(data, predictionIndex, k, numTrees, beta, score_mode):
     categories, numberOfInstances = getCategories(data, predictionIndex)
 
     predictionColumnName = data.columns[predictionIndex]
@@ -152,8 +152,10 @@ def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='mac
             results += [[instance[predictionIndex], instance_classification]]
         
         print("calculando f-score")
+        # print(results)
         fscore += [Fmeasure(results, categories, beta, score_mode)]
 
+    
     print("media  = %f" % np.mean(fscore))
     print("desvio = %f" % np.std(fscore))
 
@@ -172,6 +174,11 @@ def Fmeasure(results, categories, beta, score_mode):
             else:
                 VN += 1
 
+        # print("VP = %d" % VP)
+        # print("VN = %d" % VN)
+        # print("FP = %d" % FP)
+        # print("FN = %d" % FN)
+
         precision = VP / (VP + FP)
         recall = VP / (VP + FN)
 
@@ -180,7 +187,8 @@ def Fmeasure(results, categories, beta, score_mode):
     # classificação multiclasse
     else:
         VPac = VNac = FPac = FNac = 0 # valores acumulados para todas as classes, a ser utilizado no caso de score_mode = micro média 
-        all_precision = all_recall = [] # resultados de precisão e recall para cada classe, a ser utilizado no caso de score_mode = macro média
+        all_precision = []
+        all_recall = [] # resultados de precisão e recall para cada classe, a ser utilizado no caso de score_mode = macro média
         for category in categories:
             VP = VN = FP = FN = 0
             for r in results:
@@ -193,9 +201,15 @@ def Fmeasure(results, categories, beta, score_mode):
                 else:
                     VN += 1
             
+            # print("VP = %d" % VP)
+            # print("VN = %d" % VN)
+            # print("FP = %d" % FP)
+            # print("FN = %d" % FN)
+            
             if score_mode == 'macro':
                 precision = VP / (VP + FP)
                 recall = VP / (VP + FN)
+               
                 all_precision += [precision]
                 all_recall += [recall]
             else:
@@ -211,8 +225,7 @@ def Fmeasure(results, categories, beta, score_mode):
             precision = np.mean(all_precision)
             recall = np.mean(all_recall)
 
-        fscore = (1 - beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
-
+        fscore = (1.0 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
 
     return fscore
 
