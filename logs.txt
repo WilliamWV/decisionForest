@@ -1,0 +1,45 @@
+Dataset: wine/wine.data; Fold size: 10; Num of trees: 1; Beta: 0.5; Score mode: macro
+F-Score average = 0.756769
+F-Score deviation = 0.200797
+Dataset: wine/wine.data; Fold size: 10; Num of trees: 2; Beta: 0.5; Score mode: macro
+F-Score average = 0.646290
+F-Score deviation = 0.248623
+Dataset: wine/wine.data; Fold size: 10; Num of trees: 5; Beta: 0.5; Score mode: macro
+F-Score average = 0.834178
+F-Score deviation = 0.054114
+Dataset: wine/wine.data; Fold size: 10; Num of trees: 10; Beta: 0.5; Score mode: macro
+F-Score average = 0.874808
+F-Score deviation = 0.072365
+Dataset: wine/wine.data; Fold size: 10; Num of trees: 20; Beta: 0.5; Score mode: macro
+F-Score average = 0.898289
+F-Score deviation = 0.041283
+Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 1; Beta: 0.5; Score mode: macro
+F-Score average = 0.771005
+F-Score deviation = 0.082982
+Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 2; Beta: 0.5; Score mode: macro
+F-Score average = 0.785771
+F-Score deviation = 0.039224
+Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 5; Beta: 0.5; Score mode: macro
+F-Score average = 0.831572
+F-Score deviation = 0.044624
+Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 10; Beta: 0.5; Score mode: macro
+F-Score average = 0.799527
+F-Score deviation = 0.051480
+Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 20; Beta: 0.5; Score mode: macro
+F-Score average = 0.828501
+F-Score deviation = 0.031394
+Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 1; Beta: 0.5; Score mode: macro
+F-Score average = 0.897706
+F-Score deviation = 0.040299
+Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 2; Beta: 0.5; Score mode: macro
+F-Score average = 0.870904
+F-Score deviation = 0.038152
+Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 5; Beta: 0.5; Score mode: macro
+F-Score average = 0.936668
+F-Score deviation = 0.029526
+Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 10; Beta: 0.5; Score mode: macro
+F-Score average = 0.925143
+F-Score deviation = 0.028980
+Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 20; Beta: 0.5; Score mode: macro
+F-Score average = 0.925475
+F-Score deviation = 0.039787

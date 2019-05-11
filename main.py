@@ -102,7 +102,6 @@ def cross_validation(data, predictionIndex, k, numTrees, beta, score_mode):
     fscore = []
 
     # dividindo os folds estratificados
-    print("Dividindo os folds")
     for i in range(k):
         for category in categories:
             num_sample = numberOfInstances[category]//k
@@ -124,20 +123,16 @@ def cross_validation(data, predictionIndex, k, numTrees, beta, score_mode):
 
 
     # rodando cross-validation de fato
-    print("rodando cross-validation")
     for test_fold_index, testing_data in enumerate(k_folds):
-        print("fold #%d" % test_fold_index)
         #agrupando folds restantes em um dataframe só
         training_data = pd.DataFrame()
         for fold_index, fold in enumerate(k_folds):
             if fold_index != test_fold_index:
                 training_data = training_data.append(fold)
         
-        print("treinando ensemble #%d" % test_fold_index)
         ensemble = trainEnsemble(training_data, numTrees, predictionIndex)
 
         # classifica cada instancia usando o ensemble que acabou de aprender
-        print("classificando test fold")
         results = []
         for index, instance in testing_data.iterrows():
             instance = instance.tolist()
@@ -147,13 +142,12 @@ def cross_validation(data, predictionIndex, k, numTrees, beta, score_mode):
                 instance_classification = vote(ensemble, instance[1:], categories)
             results += [[instance[predictionIndex], instance_classification]]
         
-        print("calculando f-score")
         # print(results)
         fscore += [Fmeasure(results, categories, beta, score_mode)]
 
     
-    print("media  = %f" % np.mean(fscore))
-    print("desvio = %f" % np.std(fscore))
+    print("F-Score average = %f" % np.mean(fscore))
+    print("F-Score deviation = %f" % np.std(fscore))
 
 
 def Fmeasure(results, categories, beta, score_mode):
