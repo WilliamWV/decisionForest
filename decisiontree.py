@@ -139,9 +139,9 @@ class DecisionTree:
 		self.data = None 						# é None, a não ser que seja nodo raiz
 		self.listOfAttr = []					# é vazia, a não ser que seja nodo raiz
 	
-	def makeRootNode(self, data):
+	def makeRootNode(self, data, all_data):
 		self.data = data
-		self.listOfAttr = self.listAttributes(self.data)
+		self.listOfAttr = self.listAttributes(all_data)
 
 	def listAttributes(self, data):
 		attributes = []

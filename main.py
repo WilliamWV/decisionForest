@@ -61,10 +61,10 @@ def trainEnsemble(data, numTrees):
     ensemble = []
     for tree_index in range(numTrees):
         train, test = bootstrap(data)
-        print("treino: "+ str(len(train)) + "\n" + str(train))
+        # print("treino: "+ str(len(train)) + "\n" + str(train))
 
         root = dt.DecisionTree()
-        root.makeRootNode(train)
+        root.makeRootNode(train, data)
         root.induce(root.data, root.listOfAttr)
 
         ensemble += [root]
@@ -87,9 +87,54 @@ def vote(ensemble, instance, categories):
         return category
 
 
-def cross_validation(data, predictionIndex):
+def cross_validation(data, predictionIndex, k, numTrees):
     categories, numberOfInstances = getCategories(data, predictionIndex)
 
+    predictionColumnName = data.columns[predictionIndex]
+    data_split_per_category = {}
+
+    for category in categories:
+        data_split_per_category[category] = data[data[predictionColumnName]==category]
+
+    k_folds = [pd.DataFrame()] * k
+
+    # dividindo os folds estratificados
+    for i in range(k):
+        for category in categories:
+            num_sample = numberOfInstances[category]//k
+            sample = data_split_per_category[category].sample(n=num_sample)
+            k_folds[i] = k_folds[i].append(sample)
+            data_split_per_category[category] = data_split_per_category[category].drop(sample.index)
+
+
+    # adicionando as instâncias que sobraram por categoria uma em cada fold (pra não ficar muito desparelha a quantidade total de instancias)
+    instances_rest = pd.DataFrame()
+    for category, data in data_split_per_category.items():
+        instances_rest = instances_rest.append(data)
+
+    fold_index = 0
+    for i in range(len(instances_rest.index)):
+        fold_index %= k
+        k_folds[fold_index] = k_folds[fold_index].append(instances_rest.iloc[[i]])
+        fold_index += 1
+
+
+    # rodando cross-validation de fato
+    for test_fold_index, testing_data in enumerate(k_folds):
+        training_data = pd.DataFrame()
+        for fold_index, fold in enumerate(k_folds):
+            if fold_index != test_fold_index:
+                training_data = training_data.append(fold)
+        
+        ensemble = trainEnsemble(training_data, numTrees)
+
+        results = []
+        for index, instance in testing_data.iterrows():
+            instance = instance.tolist()
+            instance_classification = vote(ensemble, instance[:-1], categories)
+            results += [[instance[-1], instance_classification]]
+        
+        # todo Fscore
 
 
     
@@ -104,8 +149,8 @@ def cross_validation(data, predictionIndex):
 def main():
     fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
     data = parse(fileName)
-    # test.test(data
-    cross_validation(data, -1)
+    # test.test(data)
+    cross_validation(data, -1, 3, 5)
 
 
 if __name__ == "__main__":

@@ -36,7 +36,7 @@ def testBootstrap(data):
 
 def testInduce(data):
     root = dt.DecisionTree()
-    root.makeRootNode(data)
+    root.makeRootNode(data, data)
     root.induce(root.data, root.listOfAttr)
     root._print(0)
     return root
