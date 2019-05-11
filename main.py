@@ -148,7 +148,6 @@ def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='mac
             if predictionIndex == -1:
                 instance_classification = vote(ensemble, instance[:-1], categories)
             else:
-                print(instance)
                 instance_classification = vote(ensemble, instance[1:], categories)
             results += [[instance[predictionIndex], instance_classification]]
         
@@ -193,8 +192,7 @@ def Fmeasure(results, categories, beta, score_mode):
                     FP +=1
                 else:
                     VN += 1
-
-
+            
             if score_mode == 'macro':
                 precision = VP / (VP + FP)
                 recall = VP / (VP + FN)

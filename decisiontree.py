@@ -153,7 +153,7 @@ class DecisionTree:
 					numericOrCategoric = CATEGORIC
 				else:
 					numericOrCategoric = NUMERIC
-				attributes.append(Attr(numericOrCategoric, i, values, data.columns[i]))
+				attributes.append(Attr(numericOrCategoric, i-(1-self.predictedIndex), values, data.columns[i]))
 		return attributes
 
 	def addSubtree (self, newTree, decision):
