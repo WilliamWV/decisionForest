@@ -2,6 +2,7 @@ import decisiontree as dt
 import test
 import pandas as pd
 import random as rd
+import numpy as np
 import operator 
 
 # Semente para geração dos números aleatórios, usada em fase de 
@@ -87,7 +88,7 @@ def vote(ensemble, instance, categories):
         return category
 
 
-def cross_validation(data, predictionIndex, k, numTrees):
+def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='macro'):
     categories, numberOfInstances = getCategories(data, predictionIndex)
 
     predictionColumnName = data.columns[predictionIndex]
@@ -97,6 +98,7 @@ def cross_validation(data, predictionIndex, k, numTrees):
         data_split_per_category[category] = data[data[predictionColumnName]==category]
 
     k_folds = [pd.DataFrame()] * k
+    fscore = []
 
     # dividindo os folds estratificados
     for i in range(k):
@@ -121,6 +123,7 @@ def cross_validation(data, predictionIndex, k, numTrees):
 
     # rodando cross-validation de fato
     for test_fold_index, testing_data in enumerate(k_folds):
+        #agrupando folds restantes em um dataframe só
         training_data = pd.DataFrame()
         for fold_index, fold in enumerate(k_folds):
             if fold_index != test_fold_index:
@@ -128,13 +131,74 @@ def cross_validation(data, predictionIndex, k, numTrees):
         
         ensemble = trainEnsemble(training_data, numTrees)
 
+        # classifica cada instancia usando o ensemble que acabou de aprender
         results = []
         for index, instance in testing_data.iterrows():
             instance = instance.tolist()
             instance_classification = vote(ensemble, instance[:-1], categories)
             results += [[instance[-1], instance_classification]]
         
-        # todo Fscore
+        fscore += [Fmeasure(results, categories, beta, score_mode)]
+        
+
+def Fmeasure(results, categories, beta, score_mode):
+    # classificação binária
+    if len(categories) == 2:
+        VP = VN = FP = FN = 0
+        for r in results:
+            if r[0] == categories[0] and r[1] == categories[0]:
+                VP += 1
+            elif r[0] == categories[0] and r[1] != categories[0]:
+                FN +=1
+            elif r[0] != categories[0] and r[1] == categories[0]:
+                FP +=1
+            else:
+                VN += 1
+
+        precision = VP / (VP + FP)
+        recall = VP / (VP + FN)
+
+        fscore = (1 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
+
+    # classificação multiclasse
+    else:
+        VPac = VNac = FPac = FNac = 0 # valores acumulados para todas as classes, a ser utilizado no caso de score_mode = micro média 
+        all_precision = all_recall = [] # resultados de precisão e recall para cada classe, a ser utilizado no caso de score_mode = macro média
+        for category in categories:
+            VP = VN = FP = FN = 0
+            for r in results:
+                if r[0] == category and r[1] == category:
+                    VP += 1
+                elif r[0] == category and r[1] != category:
+                    FN +=1
+                elif r[0] != category and r[1] == category:
+                    FP +=1
+                else:
+                    VN += 1
+
+
+            if score_mode == 'macro':
+                precision = VP / (VP + FP)
+                recall = VP / (VP + FN)
+                all_precision += [precision]
+                all_recall += [recall]
+            else:
+                VPac += VP
+                VNac += VN
+                FPac += FP
+                FNac += FN
+
+        if score_mode == 'micro':
+            precision = VPac / (VPac + FPac)
+            recall = VPac / (VPac + FNac)
+        else: # macro
+            precision = np.mean(all_precision)
+            recall = np.mean(all_recall)
+
+        fscore = (1 - beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
+
+
+    return fscore
 
 
     
