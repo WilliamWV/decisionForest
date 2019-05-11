@@ -4,6 +4,7 @@ import pandas as pd
 import random as rd
 import numpy as np
 import operator 
+import argparse
 
 # Semente para geração dos números aleatórios, usada em fase de 
 # desenvolvimento para permitir que os resultados possam ser repetidos
@@ -25,9 +26,13 @@ def getCategories(data, predictionIndex):
     return columnValues, numberOfInstances
 
 
-def parse(fileName):
-    data = pd.read_csv(fileName, delimiter=';', header=0)
+def parse(fileName, ignore):
+    data = pd.read_csv(fileName, delimiter=',', header=0)
     dt.Data = data.values.tolist()
+
+    if ignore:
+        data = data.drop(columns=[ignore])
+    
     return data
 
 # Realização do bootstrap dos dados dividindo-os em conjunto de teste
@@ -58,13 +63,13 @@ def bootstrap(data):
 
 
 
-def trainEnsemble(data, numTrees):
+def trainEnsemble(data, numTrees,predictionIndex):
     ensemble = []
     for tree_index in range(numTrees):
         train, test = bootstrap(data)
         # print("treino: "+ str(len(train)) + "\n" + str(train))
 
-        root = dt.DecisionTree()
+        root = dt.DecisionTree(predictedIndex=predictionIndex)
         root.makeRootNode(train, data)
         root.induce(root.data, root.listOfAttr)
 
@@ -101,6 +106,7 @@ def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='mac
     fscore = []
 
     # dividindo os folds estratificados
+    print("Dividindo os folds")
     for i in range(k):
         for category in categories:
             num_sample = numberOfInstances[category]//k
@@ -122,24 +128,36 @@ def cross_validation(data, predictionIndex, k, numTrees, beta=1, score_mode='mac
 
 
     # rodando cross-validation de fato
+    print("rodando cross-validation")
     for test_fold_index, testing_data in enumerate(k_folds):
+        print("fold #%d" % test_fold_index)
         #agrupando folds restantes em um dataframe só
         training_data = pd.DataFrame()
         for fold_index, fold in enumerate(k_folds):
             if fold_index != test_fold_index:
                 training_data = training_data.append(fold)
         
-        ensemble = trainEnsemble(training_data, numTrees)
+        print("treinando ensemble #%d" % test_fold_index)
+        ensemble = trainEnsemble(training_data, numTrees, predictionIndex)
 
         # classifica cada instancia usando o ensemble que acabou de aprender
+        print("classificando test fold")
         results = []
         for index, instance in testing_data.iterrows():
             instance = instance.tolist()
-            instance_classification = vote(ensemble, instance[:-1], categories)
-            results += [[instance[-1], instance_classification]]
+            if predictionIndex == -1:
+                instance_classification = vote(ensemble, instance[:-1], categories)
+            else:
+                print(instance)
+                instance_classification = vote(ensemble, instance[1:], categories)
+            results += [[instance[predictionIndex], instance_classification]]
         
+        print("calculando f-score")
         fscore += [Fmeasure(results, categories, beta, score_mode)]
-        
+
+    print("media  = %f" % np.mean(fscore))
+    print("desvio = %f" % np.std(fscore))
+
 
 def Fmeasure(results, categories, beta, score_mode):
     # classificação binária
@@ -211,10 +229,38 @@ def Fmeasure(results, categories, beta, score_mode):
 ###       convertido para listas, ou seja: treino.values.tolist()
 
 def main():
-    fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
-    data = parse(fileName)
+    parser = argparse.ArgumentParser(description="Random forests")
+
+
+    parser.add_argument("-d", "--dataset", required=True, type=str, 
+                        help="filename of the dataset")
+
+    parser.add_argument("-k", "--folds_number", required=True, type=int,
+                        help="the number of folders to divide the dataset in cross-validation")
+
+    parser.add_argument('-t', '--trees_number', required=True, type=int,
+                        help='number of trees in the ensemble')
+
+    parser.add_argument('-p', '--prediction_index', required=True, type=int,
+                        help="the index of the column with the classification info")
+
+    parser.add_argument('-i', '--ignore', type=str,
+                        help="the name of a column to ignore e.g. ID")
+
+    parser.add_argument('-b', '--beta', type=float, default=1,
+                        help="beta value of fmeasure")
+
+    parser.add_argument('-s', '--score_mode', type=str, default="macro",
+                        help="type of mean (macro or micro) to use on the fmeasure calc in case the data is multiclass")
+
+    args = parser.parse_args()
+
+    # fileName = "dadosBenchmark_validacaoAlgoritmoAD.csv"
+    # fileName = "breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+    data = parse(args.dataset, args.ignore)
+    # print(data)
     # test.test(data)
-    cross_validation(data, -1, 3, 5)
+    cross_validation(data, args.prediction_index, args.folds_number, args.trees_number, args.beta, args.score_mode)
 
 
 if __name__ == "__main__":
