@@ -5,6 +5,7 @@ import random as rd
 import numpy as np
 import operator 
 import argparse
+import time
 
 # Semente para geração dos números aleatórios, usada em fase de 
 # desenvolvimento para permitir que os resultados possam ser repetidos
@@ -235,7 +236,10 @@ def main():
     data = parse(args.dataset, args.ignore)
     # print(data)
     # test.test(data)
+    start = time. time()
     cross_validation(data, args.prediction_index, args.folds_number, args.trees_number, args.beta, args.score_mode)
+    end = time. time()
+    print("Execution time = %f" % (end - start))
 
 
 if __name__ == "__main__":

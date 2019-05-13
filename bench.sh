@@ -12,9 +12,13 @@ MAIN="main.py"
 
 #argumentos
 FOLDS=$( echo "10";)
-N_TREES=$( echo "1"; echo "2"; echo "5"; echo "10"; echo "20";)
-BETAS=$( echo "0.5"; )
-SCORES=$( echo "macro"; )
+# N_TREES=$( echo "1"; echo "2"; echo "5"; echo "10"; echo "20";)
+N_TREES=$(for i in $(seq 5 5 100) 
+            do 
+                echo "${i}";
+            done)
+BETAS=$( echo "1"; )
+SCORES=$( echo "micro"; )
 #prediction_index
 declare -A pred_indexes=([$wine_data]="0" [$ionosphere_data]="-1" [$wdbc_data]="0") # declara um array associativo (HASH) # wdbc é 0 apesar de ser a segunda coluna pois ignora a primeira
 #ignore -> id do wdbc
@@ -26,7 +30,7 @@ declare -A ignore=([$wine_data]="" [$ionosphere_data]="" [$wdbc_data]="-i id")
 #   F-Score average = $average
 #   F-score deviation = $deviation
 
-LOG_FILE="logs.txt"
+LOG_FILE="logs_1-100_seed1_micro.txt"
 > $LOG_FILE # apaga logs anteriores
 
 
