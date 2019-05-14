@@ -71,14 +71,14 @@ def testVote(data):
 
 def test(data):
 	# print("######################## TESTE INDUCE ###########################")
-	# tree = testInduce(data)
+	tree = testInduce(data)
 	# print("######################## TESTE PLOTTING ###########################")
-	# # testPlotting(tree)
+	testPlotting(tree)
 	# print("######################## TESTE CLASSIFY ###########################")
 	# testClassify(tree)
 	# print("######################## TESTE BOOTSTRAP ###########################")
 	# testBootstrap(data)
 	# print("######################## TESTE ENSEMBLE ###########################")
 	# testEnsemble(data)
-    print("######################## TESTE VOTE ###########################")
+	# print("######################## TESTE VOTE ###########################")
     # testVote(data)

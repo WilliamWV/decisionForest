@@ -45,9 +45,9 @@ class PlotTree:
                     self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
                 else:
                     if key == dt.NUM_GREATER:
-                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.cutPoint), color)
                     else:
-                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.cutPoint), color)
 
     def decisionTreeToGraphviz(self, tree, color):
         nodeName = tree.questionAttr.attrName
@@ -64,9 +64,9 @@ class PlotTree:
                     self.subtreesToGraphviz(tree.subtrees[key], nodeName, key, color)
                 else:
                     if key == dt.NUM_GREATER:
-                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " > " + "{:.3f}".format(tree.cutPoint), color)
                     else:
-                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.questionAttr.cutPoint), color)
+                        self.subtreesToGraphviz(tree.subtrees[key], nodeName, " <= " + "{:.3f}".format(tree.cutPoint), color)
 
     def drawTree(self):
         time = strftime("%d_%m_%Y_%H_%M_%S", localtime())

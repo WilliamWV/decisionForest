@@ -77,7 +77,7 @@ class Attr:
 		#Usa média dos valores
 		total = 0
 
-		return sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)
+		return [sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)]
 
 	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
 	# a esse atributo
@@ -133,6 +133,7 @@ class DecisionTree:
 	def __init__(self, predictedIndex=-1, answer=None):
 		self.subtrees = {}						# é vazio se for nodo de resposta (ou seja, nodo folha); a chave é a resposta para uma pergunta, o valor é a subárvore alcançada por tal resposta
 		self.questionAttr = None				# é None se for nodo de resposta (ou seja, nodo folha)
+		self.cutPoint = math.inf				# soh sera diferente de infinito para nodos de decisao com questionAttr numerico
 		self.predictedIndex = predictedIndex	# índice do atributo a ser previsto
 		self.answer = answer					# é None se for nodo de decisão (ou seja, nodo interno)
 		self.nodeGain = 0
@@ -172,18 +173,16 @@ class DecisionTree:
 		columnName = D.columns[self.predictedIndex] # nome da coluna a ser predita
 		column = D[columnName] # pega todos os dados da coluna
 		columnValues = column.unique() # separa cada valor único da coluna
-		
 		if len(columnValues) == 1:
 			self.answer = columnValues[0]
 			return self
-		
 		mostFrequentValue = column.value_counts().idxmax() # pega o valor mais frequente da coluna
 		if len(L) == 0:
 			self.answer = mostFrequentValue
 			return self
-		
-		bestAttr = self.selectAndRemoveAttr(L, D)
+		bestAttr, cutPoint = self.selectAndRemoveAttr(L, D)
 		self.questionAttr = bestAttr
+		self.cutPoint = cutPoint
 		columnName = D.columns[bestAttr.attrIndex]
 
 		if bestAttr.attrType == CATEGORIC:
@@ -197,7 +196,7 @@ class DecisionTree:
 				else:
 					self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), bestAttr.catVals[i] )
 		else:
-			Dv = D.loc[ D[columnName] <= bestAttr.cutPoint ]
+			Dv = D.loc[ D[columnName] <= cutPoint ]
 			if Dv.empty:
 				columnNamePred = D.columns[self.predictedIndex]
 				column = D[columnNamePred]
@@ -205,7 +204,7 @@ class DecisionTree:
 				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex, answer=mostFrequentValue), NUM_SMALLER )
 			else:
 				self.addSubtree( DecisionTree(predictedIndex=self.predictedIndex).induce(Dv, L), NUM_SMALLER )
-			Dv = D.loc[ D[columnName] > bestAttr.cutPoint ]
+			Dv = D.loc[ D[columnName] > cutPoint ]
 			if Dv.empty:
 				columnNamePred = D.columns[self.predictedIndex]
 				column = D[columnNamePred]
@@ -240,6 +239,7 @@ class DecisionTree:
 		#m = len(L) # Quantidade de atributos na amostragem
 		m = int(math.ceil(math.sqrt(len(L)))) # usando m como raiz quadrada -> alternativa sugerida nos slides
 		attributesSample = rd.sample(L, m)
+		cut = [math.inf, math.inf]
 		for i in attributesSample:
 			columnName = D.columns[i.attrIndex] # nome do atributo cujo ganho está sendo calculado
 			infoAD = 0
@@ -249,26 +249,35 @@ class DecisionTree:
 					counter = len(Dj.index) # número de linhas em Dj
 					infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
 			else:
-				Dj = D.loc[ D[columnName] <= i.cutPoint ]
-				counter = len(Dj.index)
-				infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
-				Dj = D.loc[ D[columnName] > i.cutPoint ]
-				counter = len(Dj.index)
-				infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
-			gain = infoD - infoAD
-			attributesGain.append([gain, i])
+				for j in i.cutPoint:
+					infoAD = 0
+					Dj = D.loc[ D[columnName] <= j ]
+					counter = len(Dj.index)
+					infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
+					Dj = D.loc[ D[columnName] > j ]
+					counter = len(Dj.index)
+					infoAD = infoAD + (counter/len(D.index))*self.info(Dj)
+					if infoAD < cut[0]: # menor infoAD ira gerar ganho maior
+						cut[0] = infoAD
+						cut[1] = j
+			if i.attrType == CATEGORIC:
+				gain = infoD - infoAD
+			else:
+				gain = infoD - cut[0]				
+			attributesGain.append([gain, i, cut[1]])
 		return attributesGain
 
 	def selectAndRemoveAttr(self, L, D):
 		attributesGain = self.gain(L, D)
 		attributesGain.sort(key=lambda x: x[0], reverse=True)
 		attr = attributesGain[0][1]
+		cutPoint = attributesGain[0][2]
 		self.nodeGain = attributesGain[0]
 		for i in range(0, len(L)):
 			if L[i] == attr:
 				del L[i]
 				break
-		return attr
+		return attr, cutPoint
 
 	def isAnswerNode(self):
 		if self.answer is not None:
@@ -300,9 +309,9 @@ class DecisionTree:
 				print("Subárvore " + str(index) + " (valor: ", end="")
 				if (self.isQuestionNode() and self.questionAttr.attrType == NUMERIC):
 					if (key == NUM_GREATER):
-						print ("> " + str(self.questionAttr.cutPoint), end="")
+						print ("> " + str(self.cutPoint), end="")
 					else:
-						print ("<= " + str(self.questionAttr.cutPoint), end="")
+						print ("<= " + str(self.cutPoint), end="")
 				else:
 					print(key, end="")
 				print("):")

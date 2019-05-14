@@ -235,7 +235,7 @@ def main():
     # fileName = "breast-cancer-wisconsin/breast-cancer-wisconsin.data"
     data = parse(args.dataset, args.ignore)
     # print(data)
-    # test.test(data)
+    #test.test(data)
     start = time. time()
     cross_validation(data, args.prediction_index, args.folds_number, args.trees_number, args.beta, args.score_mode)
     end = time. time()
