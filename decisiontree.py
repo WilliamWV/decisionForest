@@ -81,9 +81,9 @@ class Attr:
 
 	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
 	# a esse atributo
-	def decide (self, instance, predictedIndex):
+	def decide (self, instance, predictedIndex, cutPoint):
 		if self.attrType == NUMERIC:
-			if (instance[self.attrIndex-(1+predictedIndex)] > self.cutPoint):
+			if (instance[self.attrIndex-(1+predictedIndex)] > cutPoint):
 				return NUM_GREATER
 			else:
 				return NUM_SMALLER
@@ -166,7 +166,7 @@ class DecisionTree:
 		if (self.questionAttr == None):
 			return self.answer
 		else:
-			return self.subtrees[self.questionAttr.decide(instance, self.predictedIndex)].classify(instance)
+			return self.subtrees[self.questionAttr.decide(instance, self.predictedIndex, self.cutPoint)].classify(instance)
 
 
 	def induce(self, D, L):
