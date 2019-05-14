@@ -1,6 +1,7 @@
 import pandas as pd
 import math
 import random as rd
+import numpy as np
 
 # -*- coding: utf-8 -*-
 
@@ -42,7 +43,7 @@ Data = [[]]
 ################################################################################
 class Attr:
 
-	def __init__(self, attrType, attrIndex, values, attrName):
+	def __init__(self, attrType, attrIndex, values, attrName, data, predictedIndex):
 		self.attrType = attrType
 		self.attrIndex = attrIndex
 		self.attrName = attrName
@@ -50,7 +51,7 @@ class Attr:
 		if (attrType == CATEGORIC):
 			self.catVals = values
 		elif (attrType == NUMERIC):
-			self.cutPoint = self._calcCutPoint()	
+			self.cutPoint = self._calcCutPoint(data, predictedIndex)	
 
 	def isNumeric(self):
 		if self.attrType == NUMERIC:
@@ -73,11 +74,41 @@ class Attr:
 		else:
 			return self.catVals
 
-	def _calcCutPoint(self):
-		#Usa média dos valores
-		total = 0
+	def _calcCutPoint(self, data, predictionIndex):
 
-		return [sum([Data[i][self.attrIndex] for i in range(len(Data))]) / len(Data)]
+		############# OPÇÕES DE PONTO DE CORTE #############
+		######### Medidas estatísticas simples: ############
+		# Média: Possuiu os melhores resultados dentre as medidas simples
+		# return [np.mean(data[data.columns[self.attrIndex]].tolist())]
+		# Mediana: 
+		# return [np.median(data[data.columns[self.attrIndex]].tolist())]
+		# Moda: problema com a moda: para usar essas bibliotecas do numpy precisa que os valores sejam positivos
+		# os resultados experimentais da moda foram os piores dos três testados
+		# return [np.bincount(data[data.columns[self.attrIndex]].tolist()).argmax()]
+		## Obtenção de valores que melhor dividem as classes ##
+		# Como nos slides: vantagem: ponto de corte melhor, desvantagem: potencialmente muito custo de execução
+		# 1) Ordenar os valores do atributos
+		possibleCuts = []
+		s_vals = data.sort_values(by=[data.columns[self.attrIndex]])
+		for i in range(1, len(s_vals)):
+			preds = s_vals[data.columns[predictionIndex]].tolist()
+			vals = s_vals[data.columns[self.attrIndex]].tolist()
+			if preds[i] != preds[i-1]:
+				avg = (vals[i] + vals[i-1])/2
+				possibleCuts.append(avg)
+		return possibleCuts
+
+		# Ideia 1: Objetivo: ser mais rápido que a implementação dos slides mas tentar aproximar a precisão
+		# Útil quando o número de classes é muito menor que o número de instâncias e a distribuição dos valores
+		# dos atributos segue uma distribuição normal (se não seguir a separação por uma média simples pode ser
+		# imprecisa)
+		# Método:
+		#  1) Calcular a média dos valores desse atributo de cada uma das classes
+		#  2) Formar uma lista com todas as combinações duas a duas desass médias (realizar a média de cada par)
+		#  3) Determinar qual dos valores de 2 possui o maior ganho de informação
+		# Ideia 2: Objetivo: ser mais rápida que a ideia um gerando apenas um valor 
+		# Útil quando a quantidade de classes se aproxima da quantidade de instâncias (acho que isso deve ser bem raro)
+		#  1)  
 
 	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
 	# a esse atributo
@@ -154,7 +185,7 @@ class DecisionTree:
 					numericOrCategoric = CATEGORIC
 				else:
 					numericOrCategoric = NUMERIC
-				attributes.append(Attr(numericOrCategoric, i, values, data.columns[i]))
+				attributes.append(Attr(numericOrCategoric, i, values, data.columns[i], self.data, self.predictedIndex))
 		return attributes
 
 	def addSubtree (self, newTree, decision):
