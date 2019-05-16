@@ -104,11 +104,21 @@ class Attr:
 		# imprecisa)
 		# Método:
 		#  1) Calcular a média dos valores desse atributo de cada uma das classes
+		# avgs_of_classes = []
+		# classes = data[data.columns[predictionIndex]].unique()
+		# for c in classes:
+		# 	insts_of_class = data.loc[data[data.columns[predictionIndex]] == c]
+		#	attr_vals = insts_of_class[data.columns[self.attrIndex]].tolist()
+		#	avgs_of_classes.append(np.mean(attr_vals))
+
 		#  2) Formar uma lista com todas as combinações duas a duas desass médias (realizar a média de cada par)
+		# combinations = []
+		# for i in range(len(avgs_of_classes)-1):
+		#	for j in range(i+1, len(avgs_of_classes)):
+		#		combinations.append((avgs_of_classes[i] + avgs_of_classes[j]) / 2)
 		#  3) Determinar qual dos valores de 2 possui o maior ganho de informação
-		# Ideia 2: Objetivo: ser mais rápida que a ideia um gerando apenas um valor 
-		# Útil quando a quantidade de classes se aproxima da quantidade de instâncias (acho que isso deve ser bem raro)
-		#  1)  
+		#return combinations
+		
 
 	# recebe uma nova instância e retorna um valor correspondente a sua classificação quanto
 	# a esse atributo
