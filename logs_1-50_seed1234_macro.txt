@@ -127,3 +127,6 @@ F-Score average = 0.964219
 F-Score deviation = 0.028697
 Execution time = 8321.843843
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 50; Beta: 1; Score mode: macro
+F-Score average = 0.960445
+F-Score deviation = 0.031198
+Execution time = 10663.827263
