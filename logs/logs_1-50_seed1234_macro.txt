@@ -1,132 +1,99 @@
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 1; Beta: 1; Score mode: macro
-F-Score average = 0.864162
-F-Score deviation = 0.101850
-Execution time = 35.471968
+F-Score average = 0.913552
+F-Score deviation = 0.049274
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 2; Beta: 1; Score mode: macro
-F-Score average = 0.889747
-F-Score deviation = 0.065712
-Execution time = 75.050939
+F-Score average = 0.867231
+F-Score deviation = 0.089286
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 3; Beta: 1; Score mode: macro
-F-Score average = 0.905805
-F-Score deviation = 0.053409
-Execution time = 110.720803
+F-Score average = 0.906318
+F-Score deviation = 0.077059
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 4; Beta: 1; Score mode: macro
-F-Score average = 0.937209
-F-Score deviation = 0.039382
-Execution time = 156.191097
+F-Score average = 0.931274
+F-Score deviation = 0.051278
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 5; Beta: 1; Score mode: macro
-F-Score average = 0.975311
-F-Score deviation = 0.024754
-Execution time = 210.324867
+F-Score average = 0.957199
+F-Score deviation = 0.047656
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 10; Beta: 1; Score mode: macro
-F-Score average = 0.963297
-F-Score deviation = 0.041650
-Execution time = 398.477839
+F-Score average = 0.978945
+F-Score deviation = 0.035904
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 15; Beta: 1; Score mode: macro
-F-Score average = 0.968055
-F-Score deviation = 0.042798
-Execution time = 590.857682
+F-Score average = 0.970132
+F-Score deviation = 0.039781
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 20; Beta: 1; Score mode: macro
-F-Score average = 0.973783
-F-Score deviation = 0.036724
-Execution time = 787.523969
+F-Score average = 0.969249
+F-Score deviation = 0.041119
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 30; Beta: 1; Score mode: macro
-F-Score average = 0.974894
-F-Score deviation = 0.034118
-Execution time = 1166.095498
+F-Score average = 0.968247
+F-Score deviation = 0.035996
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 40; Beta: 1; Score mode: macro
-F-Score average = 0.984917
-F-Score deviation = 0.023062
-Execution time = 1544.982170
+F-Score average = 0.966286
+F-Score deviation = 0.037076
 Dataset: wine/wine.data; Fold size: 10; Num of trees: 50; Beta: 1; Score mode: macro
-F-Score average = 0.980051
-F-Score deviation = 0.024458
-Execution time = 1994.455763
+F-Score average = 0.975081
+F-Score deviation = 0.024940
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 1; Beta: 1; Score mode: macro
-F-Score average = 0.838581
-F-Score deviation = 0.064601
-Execution time = 163.364811
+F-Score average = 0.866901
+F-Score deviation = 0.050355
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 2; Beta: 1; Score mode: macro
-F-Score average = 0.875687
-F-Score deviation = 0.057926
-Execution time = 348.281961
+F-Score average = 0.866563
+F-Score deviation = 0.064770
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 3; Beta: 1; Score mode: macro
-F-Score average = 0.884921
-F-Score deviation = 0.064462
-Execution time = 548.083986
+F-Score average = 0.902247
+F-Score deviation = 0.030181
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 4; Beta: 1; Score mode: macro
-F-Score average = 0.920334
-F-Score deviation = 0.029924
-Execution time = 698.648630
+F-Score average = 0.900982
+F-Score deviation = 0.038741
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 5; Beta: 1; Score mode: macro
-F-Score average = 0.914748
-F-Score deviation = 0.043141
-Execution time = 850.591789
+F-Score average = 0.914428
+F-Score deviation = 0.032720
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 10; Beta: 1; Score mode: macro
-F-Score average = 0.917064
-F-Score deviation = 0.037361
-Execution time = 1739.239098
+F-Score average = 0.925893
+F-Score deviation = 0.034891
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 15; Beta: 1; Score mode: macro
-F-Score average = 0.929373
-F-Score deviation = 0.039925
-Execution time = 2572.675713
+F-Score average = 0.913253
+F-Score deviation = 0.039886
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 20; Beta: 1; Score mode: macro
-F-Score average = 0.930965
-F-Score deviation = 0.041875
-Execution time = 3434.358130
+F-Score average = 0.932667
+F-Score deviation = 0.023077
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 30; Beta: 1; Score mode: macro
-F-Score average = 0.930444
-F-Score deviation = 0.027434
-Execution time = 5174.683959
+F-Score average = 0.939104
+F-Score deviation = 0.026895
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 40; Beta: 1; Score mode: macro
-F-Score average = 0.934958
-F-Score deviation = 0.043968
-Execution time = 6927.139986
+F-Score average = 0.939264
+F-Score deviation = 0.037414
 Dataset: ionosphere/ionosphere.data; Fold size: 10; Num of trees: 50; Beta: 1; Score mode: macro
-F-Score average = 0.920116
-F-Score deviation = 0.038634
-Execution time = 8462.255841
+F-Score average = 0.936247
+F-Score deviation = 0.033305
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 1; Beta: 1; Score mode: macro
-F-Score average = 0.905370
-F-Score deviation = 0.027678
-Execution time = 193.611911
+F-Score average = 0.929102
+F-Score deviation = 0.039380
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 2; Beta: 1; Score mode: macro
-F-Score average = 0.910037
-F-Score deviation = 0.041413
-Execution time = 412.796739
+F-Score average = 0.916148
+F-Score deviation = 0.032645
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 3; Beta: 1; Score mode: macro
-F-Score average = 0.933973
-F-Score deviation = 0.024895
-Execution time = 589.081704
+F-Score average = 0.931007
+F-Score deviation = 0.033533
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 4; Beta: 1; Score mode: macro
-F-Score average = 0.945445
-F-Score deviation = 0.024138
-Execution time = 808.001311
+F-Score average = 0.933777
+F-Score deviation = 0.036799
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 5; Beta: 1; Score mode: macro
-F-Score average = 0.959152
-F-Score deviation = 0.026112
-Execution time = 984.281645
+F-Score average = 0.942300
+F-Score deviation = 0.028822
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 10; Beta: 1; Score mode: macro
-F-Score average = 0.954438
-F-Score deviation = 0.019679
-Execution time = 2000.246343
+F-Score average = 0.940542
+F-Score deviation = 0.038872
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 15; Beta: 1; Score mode: macro
-F-Score average = 0.955102
-F-Score deviation = 0.027065
-Execution time = 3056.163599
+F-Score average = 0.947212
+F-Score deviation = 0.039777
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 20; Beta: 1; Score mode: macro
-F-Score average = 0.957253
-F-Score deviation = 0.029471
-Execution time = 3955.107000
+F-Score average = 0.960458
+F-Score deviation = 0.034489
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 30; Beta: 1; Score mode: macro
-F-Score average = 0.953474
-F-Score deviation = 0.023896
-Execution time = 6057.713040
+F-Score average = 0.966353
+F-Score deviation = 0.029987
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 40; Beta: 1; Score mode: macro
-F-Score average = 0.951745
-F-Score deviation = 0.027115
-Execution time = 8248.465643
+F-Score average = 0.964219
+F-Score deviation = 0.028697
 Dataset: wdbc/wdbc.data; Fold size: 10; Num of trees: 50; Beta: 1; Score mode: macro
-F-Score average = 0.959370
-F-Score deviation = 0.027817
-Execution time = 9868.745347
+F-Score average = 0.960445
+F-Score deviation = 0.031198
